@@ -1,0 +1,34 @@
+---
+- hosts: all
+  become: true
+  tasks:
+    - name: Install updates (Debian)
+      tags: always
+      apt:
+        upgrade: dist
+        update_cache: yes
+      when: ansible_distribution == "Debian"
+
+    - name: Install updates (CentOS)
+      tags: always
+      yum:
+        update_only: yes
+        update_cache: yes
+      when: ansible_distribution == "CentOS"
+
+- hosts: db_servers
+  become: true
+  tasks:
+    - name: Install Apache MariaDB and PHP on Debian server
+      tags: apache,apache2,debian
+      apt:
+        name:
+          - apache2
+          - libapache2-mod-php
+          - mariadb-server
+        state: latest
+        update_cache: yes
+      when: ansible_distribution == "Debian"
+
+
+
