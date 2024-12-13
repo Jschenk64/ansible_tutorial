@@ -1,0 +1,30 @@
+---
+- name: Install and configure AWS CLI on Debian
+  hosts: workstations
+  become: true
+  tasks:
+    - name: Ensure required packages are installed
+      apt:
+        name: 
+          - unzip
+          - curl
+        state: present
+
+    - name: Download AWS CLI ZIP file
+      get_url:
+        url: "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
+        dest: "/tmp/awscliv2.zip"
+
+    - name: Unzip AWS CLI installer
+      unarchive:
+        src: "/tmp/awscliv2.zip"
+        dest: "/tmp/"
+        remote_src: yes
+
+    - name: Install AWS CLI
+      command: "/tmp/aws/install"
+
+    - name: Verify AWS CLI installation
+      shell: "aws --version"
+      register: aws_version
+      failed_when: "'aws-cli' not in aws_version.stdout"
