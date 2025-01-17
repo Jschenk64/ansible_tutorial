@@ -4,4 +4,26 @@ all:
       ansible_host: 192.168.0.50
       ansible_user: osboxes
       ansible_python_interpreter: /usr/bin/python3
+    web02:
+      ansible_host: 192.168.0.51
+      ansible_user: osboxes
+      ansible_python_interpreter: /usr/bin/python3
+    db01:
+      ansible_host: 192.168.0.52
+      ansible_user: osboxes
+      ansible_python_interpreter: /usr/bin/python3
+
+  children:
+    webservers:
+      hosts:
+        web01: {}
+        web02: {}
+    dbservers:
+      hosts:
+        db01: {}
+
+    dc_oregon:
+      children:
+        webservers: {}
+        dbservers: {}
 
