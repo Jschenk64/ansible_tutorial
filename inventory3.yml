@@ -3,14 +3,37 @@
   become: yes
   tasks:
 
-    - name: Update repository index
+    - name: Install Nginx and update package cache (Ubuntu)
       apt:
+        name:
+          - nginx
+        state: latest
         update_cache: yes
       when: ansible_distribution == "Ubuntu"
 
-    - name: Install Nginx
-      apt:
-        name: nginx
+    - name: Install Apache and PHP (CentOS)
+      dnf:
+        name:
+          - httpd
+          - php
         state: latest
-      when: ansible_distribution == "Ubuntu"
+        update_cache: yes
+      when: ansible_distribution == "CentOS"
 
+    - name: Start and enable Apache (CentOS)
+      systemd:
+        name: httpd
+        state: started
+        enabled: yes
+      when: ansible_distribution == "CentOS"
+
+    - name: Open port 80 in the firewall (CentOS)
+      firewalld:
+        port: 80/tcp
+        permanent: yes
+        state: enabled
+      when: ansible_distribution == "CentOS"
+
+    - name: Reload firewall to apply changes (CentOS)
+      command: firewall-cmd --reload
+      when: ansible_distribution == "CentOS"
