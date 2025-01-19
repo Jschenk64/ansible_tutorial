@@ -1,0 +1,91 @@
+---
+- hosts: all
+  become: yes
+  pre_tasks:
+
+    - name: Install updates (Ubuntu)
+      apt:
+        upgrade: dist
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Install updates (CentOS/RHEL)
+      dnf:
+        name: "*"
+        state: latest
+      when: ansible_os_family == "RedHat"
+
+- hosts: web_srv
+  become: yes
+  tasks:
+
+    - name: Install Nginx and update package cache (Ubuntu)
+      apt:
+        name: nginx
+        state: latest
+      when: ansible_os_family == "Debian"
+
+    - name: Install Apache and PHP (CentOS/RHEL)
+      dnf:
+        name:
+          - httpd
+          - php
+        state: latest
+      when: ansible_os_family == "RedHat"
+      notify: "Start and enable Apache"
+
+- hosts: db_srv
+  become: yes
+  tasks:
+
+    - name: Install MariaDB package (Ubuntu)
+      apt:
+        name: mariadb-server
+        state: latest
+      when: ansible_os_family == "Debian"
+
+- hosts: File_srv
+  become: yes
+  tasks:
+
+    - name: Install samba package (Ubuntu)
+      package:
+        name: samba
+        state: latest
+      when: ansible_os_family == "Debian"
+
+
+
+
+    - name: Ensure firewalld is installed and running (CentOS/RHEL)
+      dnf:
+        name: firewalld
+        state: present
+      when: ansible_os_family == "RedHat"
+
+    - name: Start and enable firewalld (CentOS/RHEL)
+      systemd:
+        name: firewalld
+        state: started
+        enabled: yes
+      when: ansible_os_family == "RedHat"
+
+    - name: Open port 80 in the firewall (CentOS/RHEL)
+      firewalld:
+        port: 80/tcp
+        permanent: yes
+        state: enabled
+      when: ansible_os_family == "RedHat"
+      notify: "Reload firewall"
+
+  handlers:
+    - name: Start and enable Apache
+      systemd:
+        name: httpd
+        state: started
+        enabled: yes
+      when: ansible_os_family == "RedHat"
+
+    - name: Reload firewall
+      command: firewall-cmd --reload
+      when: ansible_os_family == "RedHat"

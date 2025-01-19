@@ -1,5 +1,10 @@
-192.168.0.50 ansible_python_interpreter=/usr/bin/python3.12 
-192.168.0.51 ansible_python_interpreter=/usr/bin/python3.12
-192.168.0.52 ansible_python_interpreter=/usr/bin/python3.12 
-192.168.0.53 ansible_python_interpreter=/bin/python3
+[web_srv]
+192.168.0.50 ansible_python_interpreter=/usr/bin/python3.12 #(Ubuntu)
+192.168.0.53 ansible_python_interpreter=/bin/python3 #(CentOS)
+
+[db_srv]
+192.168.0.52 ansible_python_interpreter=/usr/bin/python3.12 #(Ubuntu)
+
+[File_srv]
+192.168.0.51 ansible_python_interpreter=/usr/bin/python3.12 #(Ubuntu)
 

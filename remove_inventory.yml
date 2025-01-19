@@ -3,11 +3,30 @@
   become: yes
   tasks:
 
-    - name: Update repository index
-      apt:
-        update_cache: yes
-
-    - name: Install Nginx
+    - name: Remove Nginx (Debian-based)
       apt:
         name: nginx
         state: absent
+      when: ansible_os_family == "Debian"
+
+    - name: Remove Mariadb (Debian-based)
+      apt:
+        name: mariadb-server
+        state: absent
+      when: ansible_os_family == "Debian"
+
+
+    - name: Remove Samba (Debian-based)
+      package:
+        name: samba
+        state: absent
+      when: ansible_os_family == "Debian"
+
+
+    - name: Remove HTTPD and PHP (Red Hat-based)
+      dnf:
+        name:
+          - httpd
+          - php
+        state: absent
+      when: ansible_os_family == "RedHat"
